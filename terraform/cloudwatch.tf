@@ -36,10 +36,6 @@ resource "aws_cloudwatch_log_metric_filter" "error_metric_filter" {
   name           = "major-error-filter"
   log_group_name = aws_cloudwatch_log_group.lambda_log.name 
 
-resource "aws_cloudwatch_log_group" "lambda_log" {
-  name = "Lambda_Ingestion"
-
-
   pattern = "{ $.level = \"ERROR\" }"  # Detects logs where level is "ERROR"
 
   metric_transformation {

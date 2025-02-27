@@ -14,6 +14,7 @@ resource "aws_scheduler_schedule" "lambda_ingestion_schedule" {
     role_arn = aws_iam_role.eventbridge_scheduler_role.arn
 
   }
+}
 
 
 resource "aws_cloudwatch_event_rule" "invoke_step_function" {

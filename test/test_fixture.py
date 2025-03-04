@@ -22,7 +22,7 @@ def s3_client(aws_credentials):
 def bucket(s3_client):
     bucket_name = 'test_bucket'
     s3_client.create_bucket(
-        Bucket="test_bucket",
+        Bucket=bucket_name,
         CreateBucketConfiguration={"LocationConstraint": "eu-west-2"}
     )
     object_key1 = "address/seed.json"
@@ -39,6 +39,7 @@ test_list = [
     ]
 def test_func(test_list):
     return sorted(test_list, key=lambda d: d["address_id"])
+
 class TestUploadsDataWithTimeStamp:
     @pytest.mark.it("unit test: retreieves list of files from S3 bucket")
     def test_retreives_list_of_files(self, s3_client, bucket):

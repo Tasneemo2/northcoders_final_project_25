@@ -1,5 +1,5 @@
 from src.update_data_to_s3_bucket import update_data_to_s3_bucket
-from src.upload_to_s3_bucket import write_to_s3_bucket, the_list_of_tables
+from src.upload_to_s3_bucket import write_to_s3_bucket, list_of_tables
 import pytest
 import os
 import boto3

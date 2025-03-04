@@ -37,39 +37,34 @@ PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 PY34 = sys.version_info[0:2] >= (3, 4)
 
-if PY3:
-    string_types = str,
-    integer_types = int,
-    class_types = type,
-    text_type = str
-    binary_type = bytes
 
-    MAXSIZE = sys.maxsize
+string_types = str,
+integer_types = int,
+class_types = type,
+text_type = str
+binary_type = bytes
+
+MAXSIZE = sys.maxsize
+
+
+if sys.platform.startswith("java"):
+    # Jython always uses 32 bits.
+    MAXSIZE = int((1 << 31) - 1)
 else:
-    string_types = basestring,
-    integer_types = (int, long)
-    class_types = (type, types.ClassType)
-    text_type = unicode
-    binary_type = str
+    # It's possible to have sizeof(long) != sizeof(Py_ssize_t).
+    class X(object):
 
-    if sys.platform.startswith("java"):
-        # Jython always uses 32 bits.
+        def __len__(self):
+            return 1 << 31
+    try:
+        len(X())
+    except OverflowError:
+        # 32-bit
         MAXSIZE = int((1 << 31) - 1)
     else:
-        # It's possible to have sizeof(long) != sizeof(Py_ssize_t).
-        class X(object):
-
-            def __len__(self):
-                return 1 << 31
-        try:
-            len(X())
-        except OverflowError:
-            # 32-bit
-            MAXSIZE = int((1 << 31) - 1)
-        else:
-            # 64-bit
-            MAXSIZE = int((1 << 63) - 1)
-        del X
+        # 64-bit
+        MAXSIZE = int((1 << 63) - 1)
+    del X
 
 if PY34:
     from importlib.util import spec_from_loader
@@ -676,8 +671,8 @@ else:
     # Workaround for standalone backslash
 
     def u(s):
-        return unicode(s.replace(r'\\', r'\\\\'), "unicode_escape")
-    unichr = unichr
+        return str(s.replace(r'\\', r'\\\\'), "unicode_escape")
+    unichr = chr
     int2byte = chr
 
     def byte2int(bs):
@@ -686,8 +681,8 @@ else:
     def indexbytes(buf, i):
         return ord(buf[i])
     iterbytes = functools.partial(itertools.imap, ord)
-    import StringIO
-    StringIO = BytesIO = StringIO.StringIO
+    import io
+    StringIO = BytesIO = io.StringIO
     _assertCountEqual = "assertItemsEqual"
     _assertRaisesRegex = "assertRaisesRegexp"
     _assertRegex = "assertRegexpMatches"
@@ -768,11 +763,11 @@ if print_ is None:
             return
 
         def write(data):
-            if not isinstance(data, basestring):
+            if not isinstance(data, str):
                 data = str(data)
             # If the file has an encoding, encode unicode with it.
-            if (isinstance(fp, file) and
-                    isinstance(data, unicode) and
+            if (isinstance(fp, io.TextIOBase) and
+                    isinstance(data, str) and
                     fp.encoding is not None):
                 errors = getattr(fp, "errors", None)
                 if errors is None:
@@ -782,13 +777,13 @@ if print_ is None:
         want_unicode = False
         sep = kwargs.pop("sep", None)
         if sep is not None:
-            if isinstance(sep, unicode):
+            if isinstance(sep, str):
                 want_unicode = True
             elif not isinstance(sep, str):
                 raise TypeError("sep must be None or a string")
         end = kwargs.pop("end", None)
         if end is not None:
-            if isinstance(end, unicode):
+            if isinstance(end, str):
                 want_unicode = True
             elif not isinstance(end, str):
                 raise TypeError("end must be None or a string")
@@ -796,12 +791,12 @@ if print_ is None:
             raise TypeError("invalid keyword arguments to print()")
         if not want_unicode:
             for arg in args:
-                if isinstance(arg, unicode):
+                if isinstance(arg, str):
                     want_unicode = True
                     break
         if want_unicode:
-            newline = unicode("\n")
-            space = unicode(" ")
+            newline = str("\n")
+            space = str(" ")
         else:
             newline = "\n"
             space = " "

@@ -3,4 +3,5 @@
 .env
 **/.terraform
 /python_zips
+__pycache__/
 

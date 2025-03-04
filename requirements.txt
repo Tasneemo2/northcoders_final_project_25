@@ -1,15 +1,13 @@
 requests>=2.31.0
 pytest
 pytest-testdox
+pytest-cov
 boto3
 moto[all]
 pg8000
-#<<<<<<< pip_latest_update_to_txt_file
-
-#=======
 python-dotenv
 pandas
 pyarrow
 
-#>>>>>>> main
+
 

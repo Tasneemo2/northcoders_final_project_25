@@ -6,6 +6,7 @@ from moto import mock_aws
 from unittest.mock import patch, Mock
 from pprint import pprint
 import json
+import uuid
 from datetime import datetime
 @pytest.fixture(scope="module", autouse=True)
 def aws_credentials():
@@ -20,7 +21,7 @@ def s3_client(aws_credentials):
         yield boto3.client("s3", region_name="eu-west-2")
 @pytest.fixture
 def bucket(s3_client):
-    bucket_name = 'test_bucket'
+    bucket_name = f"test-bucket-{uuid.uuid4()}"
     s3_client.create_bucket(
         Bucket=bucket_name,
         CreateBucketConfiguration={"LocationConstraint": "eu-west-2"}
